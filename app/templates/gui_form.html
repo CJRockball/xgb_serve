@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Interactive GUI{% endblock %}
+{% block content %}
+<h2 class="mb-3">Single-Sample Inference</h2>
+
+<form method="post" action="/predict/gui" class="row g-3 needs-validation" novalidate>
+  <!-- Numeric inputs -->
+  <div class="col-md-4">
+    <label class="form-label" for="time_spent_alone">Time Spent Alone (0–11)</label>
+    <input class="form-control" id="time_spent_alone" name="time_spent_alone" type="number" min="0" max="11" step="1" required />
+  </div>
+
+  <div class="col-md-4">
+    <label class="form-label" for="social_event_attendance">Social Events (0–10)</label>
+    <input class="form-control" id="social_event_attendance" name="social_event_attendance" type="number" min="0" max="10" step="1" required />
+  </div>
+
+  <div class="col-md-4">
+    <label class="form-label" for="going_outside">Going&nbsp;Outside (0–10)</label>
+    <input class="form-control" id="going_outside" name="going_outside" type="number" min="0" max="10" step="1" required />
+  </div>
+
+  <!-- Binary inputs -->
+  <div class="col-md-4">
+    <label class="form-label" for="stage_fear">Stage Fear</label>
+    <select class="form-select" id="stage_fear" name="stage_fear" required>
+      <option selected disabled value="">Choose...</option>
+      <option>No</option>
+      <option>Yes</option>
+    </select>
+  </div>
+
+  <div class="col-md-4">
+    <label class="form-label" for="drained_after_socializing">Drained After Socializing</label>
+    <select class="form-select" id="drained_after_socializing" name="drained_after_socializing" required>
+      <option selected disabled value="">Choose...</option>
+      <option>No</option>
+      <option>Yes</option>
+    </select>
+  </div>
+
+  <!-- Remaining numeric inputs -->
+  <div class="col-md-4">
+    <label class="form-label" for="friends_circle_size">Friends Circle Size (0–15)</label>
+    <input class="form-control" id="friends_circle_size" name="friends_circle_size" type="number" min="0" max="15" step="1" required />
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label" for="post_frequency">Post Frequency (0–10)</label>
+    <input class="form-control" id="post_frequency" name="post_frequency" type="number" min="0" max="10" step="1" required />
+  </div>
+
+  <div class="col-12">
+    <button class="btn btn-primary" type="submit">Predict</button>
+  </div>
+</form>
+{% endblock %}

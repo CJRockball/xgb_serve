@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Prediction Result{% endblock %}
+{% block content %}
+<h2 class="mb-3">Prediction Result</h2>
+
+<div class="alert alert-info">
+  <strong>Personality:</strong> {{ result.personality }}<br>
+  <strong>Probability (Introvert):</strong> {{ "{:.2%}".format(result.probability_introvert) }}<br>
+  <strong>Probability (Extrovert):</strong> {{ "{:.2%}".format(result.probability_extrovert) }}
+</div>
+
+<h4 class="mt-4">Input Recap</h4>
+<table class="table table-sm table-striped">
+  <thead><tr><th>Feature</th><th>Value</th></tr></thead>
+  <tbody>
+    {% for k, v in input.items() %}
+      <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<a class="btn btn-outline-primary" href="/predict/gui">Predict Another</a>
+{% endblock %}
