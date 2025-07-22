@@ -1,38 +1,22 @@
+# app/api/endpoints/gui.py - OPTIMIZED VERSION
 from fastapi import APIRouter, Request, Form, status, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from app.models.predictor import PersonalityPredictor  # Import PersonalityPredictor directly
 import logging
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
 logger = logging.getLogger(__name__)
 
-# ------------------------------#
-# Render empty GUI form (GET)    #
-# ------------------------------#
-@router.get(
-    "/gui",
-    response_class=HTMLResponse,
-    tags=["GUI"],
-    summary="Render GUI form for single prediction",
-)
+@router.get("/gui", response_class=HTMLResponse, tags=["GUI"])
 async def render_gui(request: Request):
     """Render the GUI form for single prediction"""
     return templates.TemplateResponse(
-        name="gui_form.html",
-        context={"request": request, "result": None}
+        "gui_form.html",
+        {"request": request, "result": None}
     )
 
-# -----------------------------------#
-# Handle submitted form data (POST)   #
-# -----------------------------------#
-@router.post(
-    "/gui",
-    response_class=HTMLResponse,
-    tags=["GUI"],
-    summary="Handle form submission and show prediction",
-)
+@router.post("/gui", response_class=HTMLResponse, tags=["GUI"])
 async def handle_gui(
     request: Request,
     time_spent_alone: float = Form(...),
@@ -43,9 +27,9 @@ async def handle_gui(
     friends_circle_size: float = Form(...),
     post_frequency: float = Form(...),
 ):
-    """Handle form submission and show prediction result"""
+    """Handle form submission using the global predictor instance."""
     try:
-        # Build feature dict identical to API schema
+        # Build feature dict
         features = {
             "time_spent_alone": time_spent_alone,
             "stage_fear": stage_fear,
@@ -56,19 +40,13 @@ async def handle_gui(
             "post_frequency": post_frequency,
         }
 
-        # Get model loader from app state (same approach as predict.py)
-        if not hasattr(request.app.state, 'model_loader'):
-            raise HTTPException(status_code=503, detail="Model not initialized")
+        # Get the REUSABLE predictor from app state - NO MORE INSTANTIATION!
+        if not hasattr(request.app.state, 'predictor'):
+            raise HTTPException(status_code=503, detail="Predictor not initialized")
         
-        model_loader = request.app.state.model_loader
+        predictor = request.app.state.predictor  # Single line - no object creation!
         
-        if not model_loader.is_loaded():
-            raise HTTPException(status_code=503, detail="Model not loaded")
-        
-        # Create predictor instance (same as predict.py)
-        predictor = PersonalityPredictor(model_loader)
-        
-        # Make prediction directly using PersonalityPredictor
+        # Make prediction using the reusable predictor
         prediction_result = predictor.predict_single(features)
         
         logger.info(f"GUI prediction successful: {prediction_result}")
@@ -78,14 +56,13 @@ async def handle_gui(
             name="gui_result.html",
             context={
                 "request": request,
-                "result": prediction_result,  # This contains the actual prediction data
+                "result": prediction_result,
                 "input": features,
             },
             status_code=status.HTTP_200_OK,
         )
         
     except HTTPException:
-        # Re-raise HTTP exceptions as-is
         raise
     except Exception as e:
         logger.error(f"GUI prediction failed: {str(e)}")
