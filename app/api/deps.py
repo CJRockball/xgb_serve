@@ -1,8 +1,11 @@
 from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.core.database import get_db
+from jose import JWTError
+from app.db.session import get_db  # Fixed import path
 from app.crud.users import user_crud
-from app.core.security import decode_access_token
+from app.core.security import decode_access_token, oauth2_scheme
+from app.db.models import User  # Added missing import
 
 async def get_current_user(
     db: AsyncSession = Depends(get_db),

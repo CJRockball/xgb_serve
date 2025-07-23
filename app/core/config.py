@@ -15,12 +15,21 @@ class Settings(BaseSettings):
     debug: bool = False
     log_level: str = "INFO"
     
-    # Model Configuration
-    xgb_model_path: str = "models/model.ubj"  # Path to XGBoost model file
-    # Add other config fields here, e.g.:
-    # app_name: str = "Personality Predictor API"
-    # log_level: str = "INFO"
-
+    # Database Configuration - MISSING IN CURRENT VERSION
+    DATABASE_URL: str = "postgresql+asyncpg://postgres:password@localhost:5432/xgb_serve"
+    DATABASE_TEST_URL: str = "postgresql+asyncpg://postgres:password@localhost:5432/xgb_serve_test"
+    
+    # Redis Configuration
+    REDIS_URL: str = "redis://localhost:6379"
+    
+    # Security Configuration
+    SECRET_KEY: str = "your-secret-key-here-change-in-production"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ALGORITHM: str = "HS256"
+    
+    # Model Configuration  
+    xgb_model_path: str = "models/model.ubj"
+    MODEL_VERSION: str = "1.0.0"  # Added for database logging
     
     # Features configuration
     feature_names: list = [
@@ -36,11 +45,10 @@ class Settings(BaseSettings):
     # Target mapping
     target_mapping: dict = {0: "Introvert", 1: "Extrovert"}
     
-    class Config:
-        """Pydantic configuration."""
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8"
+    )
 
 @lru_cache()
 def get_settings() -> Settings:
